@@ -41,12 +41,22 @@ static const CGFloat ButtonSize = 30.0;
 
 - (void)drawRect:(CGRect)rect {
     if (!_circleLayer) {
+        NSString *medButtonSize = [[NSUserDefaults standardUserDefaults] stringForKey:@"med_button_size"];
+        double multiplier = 1;
+        if (medButtonSize != nil) {
+            if ([medButtonSize isEqualToString:@"medium"]) {
+                multiplier = 1.25;
+            } else if ([medButtonSize isEqualToString:@"large"]) {
+                multiplier = 1.5;
+            }
+        }
+        
         _circleLayer = [CAShapeLayer layer];
         _circleLayer.strokeColor = self.tintColor.CGColor;
         _circleLayer.fillColor = [UIColor clearColor].CGColor;
         [self updateFillColorForSelection:(self.isSelected || self.isHighlighted)];
         _circleLayer.lineWidth = 2.5;
-        _circleLayer.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, ButtonSize, ButtonSize)].CGPath;
+        _circleLayer.path = [UIBezierPath bezierPathWithOvalInRect:CGRectMake(0, 0, ButtonSize * multiplier, ButtonSize * multiplier)].CGPath;
         _circleLayer.fillRule = kCAFillRuleNonZero;
         [self.layer addSublayer:_circleLayer];
         

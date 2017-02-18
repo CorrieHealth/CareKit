@@ -60,6 +60,7 @@
     OCKWeekViewController *_weekViewController;
     NSCalendar *_calendar;
     NSMutableArray *_constraints;
+    NSString *_medButtonSize;
 }
 
 - (instancetype)init {
@@ -76,6 +77,7 @@
         self.maskImageTintColor = nil;
         _showEdgeIndicators = NO;
         _calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+        _medButtonSize = [NSString stringWithFormat:@"small"];
     }
     return self;
 }
@@ -116,6 +118,13 @@
     NSAssert(self.navigationController, @"OCKCareCardViewController must be embedded in a navigation controller.");
     
     _weekViewController.careCardWeekView.delegate = self;
+    
+    NSString *medButtonSize = [[NSUserDefaults standardUserDefaults] stringForKey:@"med_button_size"];
+    
+    if (medButtonSize != nil && ![medButtonSize isEqualToString:_medButtonSize]) {
+        _tableView.reloadData;
+        _medButtonSize = medButtonSize;
+    }
 }
 
 - (void)showToday:(id)sender {
