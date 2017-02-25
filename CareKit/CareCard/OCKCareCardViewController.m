@@ -122,9 +122,9 @@
     NSString *medButtonSize = [[NSUserDefaults standardUserDefaults] stringForKey:@"med_button_size"];
     
     if (medButtonSize != nil && ![medButtonSize isEqualToString:_medButtonSize]) {
-        _tableView.reloadData;
         _medButtonSize = medButtonSize;
     }
+    _tableView.reloadData;
 }
 
 - (void)showToday:(id)sender {
