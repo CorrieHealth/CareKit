@@ -189,6 +189,17 @@ static const CGFloat ButtonViewSize = 40.0;
     CGFloat LeadingMargin = self.separatorInset.left;
     CGFloat TrailingMargin = (self.separatorInset.right > 0) ? self.separatorInset.right : 25;
     
+    NSString *medButtonSize = [[NSUserDefaults standardUserDefaults] stringForKey:@"med_button_size"];
+    
+    double multiplier = 1;
+    if (medButtonSize != nil) {
+        if ([medButtonSize isEqualToString:@"Large"]) {
+            multiplier = 1.25;
+        } else if ([medButtonSize isEqualToString:@"Huge"]) {
+            multiplier = 1.5;
+        }
+    }
+    
     [_constraints addObjectsFromArray:@[
                                         [NSLayoutConstraint constraintWithItem:_titleLabel
                                                                      attribute:NSLayoutAttributeTop
@@ -311,14 +322,14 @@ static const CGFloat ButtonViewSize = 40.0;
                                                                             toItem:nil
                                                                          attribute:NSLayoutAttributeNotAnAttribute
                                                                         multiplier:1.0
-                                                                          constant:ButtonViewSize],
+                                                                          constant:ButtonViewSize * multiplier],
                                             [NSLayoutConstraint constraintWithItem:_frequencyButtons[i]
                                                                          attribute:NSLayoutAttributeHeight
                                                                          relatedBy:NSLayoutRelationEqual
                                                                             toItem:nil
                                                                          attribute:NSLayoutAttributeNotAnAttribute
                                                                         multiplier:1.0
-                                                                          constant:ButtonViewSize]
+                                                                          constant:ButtonViewSize * multiplier]
                                             ]];
     }
     
