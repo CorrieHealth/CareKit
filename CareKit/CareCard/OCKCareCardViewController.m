@@ -77,7 +77,7 @@
         self.maskImageTintColor = nil;
         _showEdgeIndicators = NO;
         _calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
-        _medButtonSize = [NSString stringWithFormat:@"small"];
+        _medButtonSize = [NSString stringWithFormat:@"Normal"];
     }
     return self;
 }

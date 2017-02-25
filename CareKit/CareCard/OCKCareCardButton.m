@@ -44,9 +44,9 @@ static const CGFloat ButtonSize = 30.0;
         NSString *medButtonSize = [[NSUserDefaults standardUserDefaults] stringForKey:@"med_button_size"];
         double multiplier = 1;
         if (medButtonSize != nil) {
-            if ([medButtonSize isEqualToString:@"medium"]) {
+            if ([medButtonSize isEqualToString:@"Large"]) {
                 multiplier = 1.25;
-            } else if ([medButtonSize isEqualToString:@"large"]) {
+            } else if ([medButtonSize isEqualToString:@"Huge"]) {
                 multiplier = 1.5;
             }
         }
