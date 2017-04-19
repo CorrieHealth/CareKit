@@ -154,8 +154,7 @@ static const CGFloat HeaderViewHeight = 225.0;
 - (void)makeCallToNumber:(NSString *)number {
     NSString *stringURL = [NSString stringWithFormat:@"tel:%@", OCKStripNonNumericCharacters(number)];
 
-    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"callMade"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"call_made" object:nil];
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:stringURL]];
 }
 
