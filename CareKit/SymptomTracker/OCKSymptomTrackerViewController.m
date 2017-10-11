@@ -277,7 +277,7 @@
             return;
     }
     
-    NSString *eventId = [[NSString alloc] initWithFormat:@"%i %@", _selectedDate.day, eventTitle];
+    NSString *eventId = [[NSString alloc] initWithFormat:@"%li %@", (long)_selectedDate.day, eventTitle];
     
     // Set up the activity
     OCKCarePlanActivity *tempActivity = [OCKCarePlanActivity assessmentWithIdentifier:eventId groupIdentifier:@"Measurement" title:eventTitle text:eventText tintColor:eventColor resultResettable:NO schedule:schedule userInfo: userInfo];
