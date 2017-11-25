@@ -747,13 +747,14 @@
 
 #pragma mark - UITableViewDelegate
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    NSString *sectionTitle = _sectionTitles[section];
-    if ([sectionTitle isEqualToString:_otherString] && (_sectionTitles.count == 1 || (_sectionTitles.count == 2 && [_sectionTitles containsObject:_optionalString]))) {
-        sectionTitle = @"";
-    }
-    return sectionTitle;
-}
+// RD: Commented out so our lowercase group IDs don't show up in header titles
+//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+//    NSString *sectionTitle = _sectionTitles[section];
+//    if ([sectionTitle isEqualToString:_otherString] && (_sectionTitles.count == 1 || (_sectionTitles.count == 2 && [_sectionTitles containsObject:_optionalString]))) {
+//        sectionTitle = @"";
+//    }
+//    return sectionTitle;
+//}
 
 // ADDED
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
