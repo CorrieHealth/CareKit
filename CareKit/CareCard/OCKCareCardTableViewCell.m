@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2016, Apple Inc. All rights reserved.
+ Copyright (c) 2017, Apple Inc. All rights reserved.
  
  Redistribution and use in source and binary forms, with or without modification,
  are permitted provided that the following conditions are met:
@@ -58,6 +58,7 @@ static const CGFloat ButtonViewSize = 40.0;
     OCKLabel *_textLabel;
     UIView *_leadingEdge;
     NSArray <OCKCareCardButton *> *_frequencyButtons;
+    UIButton *_button;
     OCKCarePlanActivity *_intervention;
     NSMutableArray *_constraints;
     OCKLabel *_missedDoseLabel;
@@ -165,6 +166,12 @@ static const CGFloat ButtonViewSize = 40.0;
     
     
     
+    if (!_button) {
+        _button = [UIButton new];
+        [_button addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:_button];
+    }
+    
     [self updateView];
     [self setUpConstraints];
     [self updateAccessibilityInfo];
@@ -183,6 +190,7 @@ static const CGFloat ButtonViewSize = 40.0;
     _titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
     _textLabel.translatesAutoresizingMaskIntoConstraints = NO;
     _missedDoseLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    _button.translatesAutoresizingMaskIntoConstraints = NO;
     
     [_titleLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
     
@@ -243,6 +251,34 @@ static const CGFloat ButtonViewSize = 40.0;
                                                                      attribute:NSLayoutAttributeTrailing
                                                                     multiplier:1.0
                                                                       constant:TrailingMargin],
+                                        [NSLayoutConstraint constraintWithItem:self
+                                                                     attribute:NSLayoutAttributeTrailing
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:_button
+                                                                     attribute:NSLayoutAttributeTrailing
+                                                                    multiplier:1.0
+                                                                      constant:0.0],
+                                        [NSLayoutConstraint constraintWithItem:self
+                                                                     attribute:NSLayoutAttributeTop
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:_button
+                                                                     attribute:NSLayoutAttributeTop
+                                                                    multiplier:1.0
+                                                                      constant:0.0],
+                                        [NSLayoutConstraint constraintWithItem:self
+                                                                     attribute:NSLayoutAttributeBottom
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:_button
+                                                                     attribute:NSLayoutAttributeBottom
+                                                                    multiplier:1.0
+                                                                      constant:0.0],
+                                        [NSLayoutConstraint constraintWithItem:_button
+                                                                     attribute:NSLayoutAttributeWidth
+                                                                     relatedBy:NSLayoutRelationEqual
+                                                                        toItem:nil
+                                                                     attribute:NSLayoutAttributeNotAnAttribute
+                                                                    multiplier:1.0
+                                                                      constant:30.0 + TrailingMargin],
                                         
                                         [NSLayoutConstraint constraintWithItem:_missedDoseLabel
                                                                      attribute:NSLayoutAttributeCenterY
@@ -369,6 +405,13 @@ static const CGFloat ButtonViewSize = 40.0;
     
 }
 
+- (void)buttonTapped:(id)sender {
+    if (self.delegate &&
+        [self.delegate respondsToSelector:@selector(careCardTableViewCell:didSelectInterventionActivity:)]) {
+        [self.delegate careCardTableViewCell:self didSelectInterventionActivity:self.interventionEvents.firstObject.activity];
+    }
+}
+
 
 #pragma mark - Accessibility
 
@@ -384,9 +427,18 @@ static const CGFloat ButtonViewSize = 40.0;
 
 - (NSArray *)accessibilityElements {
     if (self.axChildren == nil) {
-        CareCardAccessibilityElement *cellElement = [[CareCardAccessibilityElement alloc] initWithAccessibilityContainer:self];
+        
+        NSUInteger numTasksCompleted = 0;
+        for (OCKCarePlanEvent *event in self.interventionEvents) {
+            if (event.state == OCKCarePlanEventStateCompleted) {
+                numTasksCompleted++;
+            }
+        }
+        
+        OCKCareCardAccessibilityElement *cellElement = [[OCKCareCardAccessibilityElement alloc] initWithAccessibilityContainer:self];
         cellElement.accessibilityLabel = OCKAccessibilityStringForVariables(_titleLabel, _textLabel);
         cellElement.accessibilityHint = OCKLocalizedString(@"AX_CARE_CARD_HINT", nil);
+        cellElement.accessibilityValue = [NSString stringWithFormat:OCKLocalizedString(@"AX_CARE_CARD_VALUE", nil), numTasksCompleted, self.interventionEvents.count];
         self.axChildren = [NSMutableArray arrayWithObject:cellElement];
         [self.axChildren addObjectsFromArray:_frequencyButtons];
     }
@@ -396,22 +448,10 @@ static const CGFloat ButtonViewSize = 40.0;
 @end
 
 
-@implementation CareCardAccessibilityElement
+@implementation OCKCareCardAccessibilityElement
 
 - (CGRect)accessibilityFrame {
     return [[self accessibilityContainer] accessibilityFrame];
-}
-
-- (NSString *)accessibilityValue {
-    OCKCareCardTableViewCell *careCardContainer = [self accessibilityContainer];
-    
-    NSUInteger numTasksCompleted = 0;
-    for (OCKCarePlanEvent *event in careCardContainer.interventionEvents) {
-        if (event.state == OCKCarePlanEventStateCompleted) {
-            numTasksCompleted++;
-        }
-    }
-    return [NSString stringWithFormat:OCKLocalizedString(@"AX_CARE_CARD_VALUE", nil), numTasksCompleted, careCardContainer.interventionEvents.count];
 }
 
 @end
