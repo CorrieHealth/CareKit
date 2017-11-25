@@ -57,6 +57,7 @@ class SampleData: NSObject {
     */
     let contacts: [OCKContact] = [
         OCKContact(contactType: .careTeam,
+            id: "d1",
             name: "Dr. Maria Ruiz",
             relation: "Physician",
             contactInfoItems: [OCKContactInfo.phone("888-555-5512"), OCKContactInfo.sms("888-555-5512"), OCKContactInfo.email("mruiz2@mac.com")],
@@ -65,6 +66,7 @@ class SampleData: NSObject {
             image: nil),
         
         OCKContact(contactType: .careTeam,
+            id: "d2",
             name: "Bill James",
             relation: "Nurse",
             contactInfoItems: [OCKContactInfo.phone("888-555-5512"), OCKContactInfo.sms("888-555-5512"), OCKContactInfo.email("billjames2@mac.com")],
@@ -73,6 +75,7 @@ class SampleData: NSObject {
             image: nil),
         
         OCKContact(contactType: .personal,
+            id: "d3",
             name: "Tom Clark",
             relation: "Father",
             contactInfoItems: [OCKContactInfo.phone("888-555-5512"), OCKContactInfo.sms("888-555-5512")],
