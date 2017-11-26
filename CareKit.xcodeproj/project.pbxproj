@@ -125,7 +125,7 @@
 		86EA9A501C9C644E00B93BB1 /* OCKHTMLPDFWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 86EA9A4C1C9C644E00B93BB1 /* OCKHTMLPDFWriter.h */; };
 		86EA9A511C9C644E00B93BB1 /* OCKHTMLPDFWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 86EA9A4D1C9C644E00B93BB1 /* OCKHTMLPDFWriter.m */; };
 		86EA9A531C9C64C500B93BB1 /* CareKitPDFTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 86EA9A521C9C64C500B93BB1 /* CareKitPDFTests.m */; };
-		94DE3B831FCA81EF00992D4B /* OCKTimedSymptomTrackerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 94DE3B7F1FCA360F00992D4B /* OCKTimedSymptomTrackerViewController.h */; };
+		94DE3B831FCA81EF00992D4B /* OCKTimedSymptomTrackerViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 94DE3B7F1FCA360F00992D4B /* OCKTimedSymptomTrackerViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		94DE3B841FCA81F100992D4B /* OCKTimedSymptomTrackerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 94DE3B801FCA360F00992D4B /* OCKTimedSymptomTrackerViewController.m */; };
 		94DE3B871FCA8C1900992D4B /* OCKTimedSymptomTrackerTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 94DE3B851FCA8C1900992D4B /* OCKTimedSymptomTrackerTableViewCell.h */; };
 		94DE3B881FCA8C1900992D4B /* OCKTimedSymptomTrackerTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 94DE3B861FCA8C1900992D4B /* OCKTimedSymptomTrackerTableViewCell.m */; };
@@ -920,6 +920,7 @@
 				BA38457E1D9CA698007990DA /* OCKGlyph.h in Headers */,
 				BA274F401EB6F75300DD17EF /* OCKConnectMessageItem.h in Headers */,
 				24EA9FB21C9A3D420036028E /* OCKCareCardAdditionalInfoTableViewCell.h in Headers */,
+				94DE3B831FCA81EF00992D4B /* OCKTimedSymptomTrackerViewController.h in Headers */,
 				8677EE171C9775EB00588CD6 /* OCKCarePlanStore.h in Headers */,
 				241707DD1C9A3AB7005D7123 /* OCKMessageItem.h in Headers */,
 				241707D51C9A3AB7005D7123 /* OCKInsightsMessageTableViewCell.h in Headers */,
@@ -946,7 +947,6 @@
 				86EA9A4E1C9C644E00B93BB1 /* OCKDocument.h in Headers */,
 				8677EE111C9775EB00588CD6 /* OCKCarePlanEvent.h in Headers */,
 				BAD328621DB01D650021A773 /* OCKContactInfo.h in Headers */,
-				94DE3B831FCA81EF00992D4B /* OCKTimedSymptomTrackerViewController.h in Headers */,
 				241707D91C9A3AB7005D7123 /* OCKInsightsTableViewHeaderView.h in Headers */,
 				24FD43731E56843E004439EA /* OCKConnectHeaderView.h in Headers */,
 				8605A5BE1C4F04EC00DD65FF /* CareKit.h in Headers */,

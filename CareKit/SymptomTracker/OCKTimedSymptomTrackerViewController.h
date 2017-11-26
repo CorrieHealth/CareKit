@@ -72,6 +72,18 @@ typedef NS_ENUM(NSInteger, OCKTimedSymptomTrackerTime) {
 @optional
 
 /**
+ Tells the delegate when a new set of events is fetched from the care plan store.
+ 
+ This is invoked when the date changes or when the care plan store's `carePlanStoreActivityListDidChange` delegate method is called.
+ This provides a good opportunity to update the store such as fetching data from HealthKit.
+ 
+ @param viewController      The view controller providing the callback.
+ @param events              An array containing the fetched set of assessment events grouped by activity.
+ @param dateComponents      The date components for which the events will be displayed.
+ */
+- (void)timedSymptomTrackerViewController:(OCKTimedSymptomTrackerViewController *)viewController willDisplayEvents:(NSArray<OCKCarePlanEvent*> *)events dateComponents:(NSDateComponents *)dateComponents;
+
+/**
  Asks the delegate if the symptom tracker view controller should enable pull-to-refresh behavior on the activities list. If not implemented,
  pull-to-refresh will not be enabled.
  
@@ -138,6 +150,11 @@ OCK_CLASS_AVAILABLE
  See the `OCKTimedSymptomTrackerViewControllerDelegate` protocol.
  */
 @property (nonatomic, weak, nullable) id<OCKTimedSymptomTrackerViewControllerDelegate> delegate;
+
+/**
+ A reference to the `UITableView` contained in the view controller
+ */
+@property (nonatomic, readonly, nonnull) UITableView *tableView;
 
 /**
  The tint color that will be used to fill the ring view.

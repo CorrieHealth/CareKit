@@ -60,7 +60,7 @@
     NSCalendar *_calendar;
     NSMutableArray *_constraints;
     NSMutableArray *_sectionTitles;
-    NSMutableArray<OCKTimedSymptomTrackerTableViewCellViewModel *> *_tableViewData;
+    NSArray<OCKTimedSymptomTrackerTableViewCellViewModel *> *_tableViewData;
     NSString *_otherString;
     NSString *_optionalString;
 }
@@ -349,7 +349,12 @@
                       dispatch_async(dispatch_get_main_queue(), ^{
                           _events = [NSMutableArray new];
                           for (NSArray<OCKCarePlanEvent *> *events in eventsGroupedByActivity) {
-                              [_events addObjectsFromArray:[events mutableCopy]];
+                              [_events addObjectsFromArray:events];
+                          }
+                          
+                          if (self.delegate &&
+                              [self.delegate respondsToSelector:@selector(timedSymptomTrackerViewController:willDisplayEvents:dateComponents:)]) {
+                              [self.delegate timedSymptomTrackerViewController:self willDisplayEvents:[_events copy] dateComponents:_selectedDate];
                           }
                           
                           [self createViewModelsForEvents:_events];
@@ -361,18 +366,24 @@
                   }];
 }
 
-- (NSArray<OCKTimedSymptomTrackerTableViewCellViewModel *> *)createViewModelsForEvents:(NSArray<OCKCarePlanEvent *> *)events {
+- (void)createViewModelsForEvents:(NSArray<OCKCarePlanEvent *> *)events {
     NSMutableArray *morning = [NSMutableArray new];
     NSMutableArray *noon = [NSMutableArray new];
     NSMutableArray *afternoon = [NSMutableArray new];
     NSMutableArray *evening = [NSMutableArray new];
     
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"hh:mm a"];
+    NSDate *eventDate;
+    
     for (OCKCarePlanEvent *event in events) {
-        if (event.date.hour < 12) {
+        eventDate = [dateFormat dateFromString:event.activity.text];
+        NSInteger hour = [[NSCalendar currentCalendar] component:NSCalendarUnitHour fromDate:eventDate];
+        if (hour < 12) {
             [morning addObject:event];
-        } else if (event.date.hour == 12) {
+        } else if (hour == 12) {
             [noon addObject:event];
-        } else if (event.date.hour > 12 && event.date.hour < 17) {
+        } else if (hour > 12 && hour < 17) {
             [afternoon addObject:event];
         } else {
             [evening addObject:event];
@@ -384,7 +395,7 @@
     OCKTimedSymptomTrackerTableViewCellViewModel *afternoonViewModel = [[OCKTimedSymptomTrackerTableViewCellViewModel alloc] initWithTime:OCKTimedSymptomTrackerTimeAfternoon andEvents:afternoon onSelectedDate:_selectedDate];
     OCKTimedSymptomTrackerTableViewCellViewModel *eveningViewModel = [[OCKTimedSymptomTrackerTableViewCellViewModel alloc] initWithTime:OCKTimedSymptomTrackerTimeEvening andEvents:evening onSelectedDate:_selectedDate];
     
-    return [[NSArray alloc] initWithObjects:morningViewModel, noonViewModel, afternoonViewModel, eveningViewModel, nil];
+    _tableViewData = [[NSArray alloc] initWithObjects:morningViewModel, noonViewModel, afternoonViewModel, eveningViewModel, nil];
 }
 
 - (void)updateHeaderView {
@@ -501,6 +512,35 @@
     NSDateComponents *today = [self today];
     NSDateComponents *selectedDate = [self dateFromSelectedIndex:index];
     return ![selectedDate isLaterThan:today];
+}
+
+
+#pragma mark - OCKCarePlanStoreDelegate
+
+- (void)carePlanStore:(OCKCarePlanStore *)store didReceiveUpdateOfEvent:(OCKCarePlanEvent *)event {
+    for (int i = 0; i < _events.count; i++) {
+        if ([_events[i].activity.identifier isEqualToString:event.activity.identifier]) {
+            _events[i] = event;
+            
+            if (self.delegate &&
+                [self.delegate respondsToSelector:@selector(timedSymptomTrackerViewController:willDisplayEvents:dateComponents:)]) {
+                [self.delegate timedSymptomTrackerViewController:self willDisplayEvents:[_events copy] dateComponents:_selectedDate];
+            }
+            
+            [self updateHeaderView];
+            [self createViewModelsForEvents:_events];
+            
+            [_tableView reloadData];
+        }
+    }
+    
+    if ([event.date isInSameWeekAsDate: self.selectedDate]) {
+        [self updateWeekView];
+    }
+}
+
+- (void)carePlanStoreActivityListDidChange:(OCKCarePlanStore *)store {
+    [self fetchEvents];
 }
 
 

@@ -57,6 +57,7 @@
 
 // Symptom Tracker
 #import <CareKit/OCKSymptomTrackerViewController.h>
+#import <CareKit/OCKTimedSymptomTrackerViewController.h>
 
 // Insights
 #import <CareKit/OCKInsightItem.h>
