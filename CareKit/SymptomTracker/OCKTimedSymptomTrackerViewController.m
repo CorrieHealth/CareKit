@@ -32,10 +32,11 @@
 
 #import "OCKSymptomTrackerViewController.h"
 #import "OCKWeekViewController.h"
+#import "OCKTimedSymptomTrackerTableViewCellViewModel.h"
 #import "NSDateComponents+CarePlanInternal.h"
 #import "OCKWeekView.h"
 #import "OCKHeaderView.h"
-#import "OCKSymptomTrackerTableViewCell.h"
+#import "OCKTimedSymptomTrackerTableViewCell.h"
 #import "OCKWeekLabelsView.h"
 #import "OCKCarePlanStore_Internal.h"
 #import "OCKHelpers.h"
@@ -43,17 +44,15 @@
 #import "OCKGlyph_Internal.h"
 
 
-@interface OCKSymptomTrackerViewController() <OCKWeekViewDelegate, OCKCarePlanStoreDelegate, UITableViewDelegate, UITableViewDataSource, UIPageViewControllerDelegate, UIPageViewControllerDataSource>
-
-@property (nonatomic) NSDateComponents *selectedDate;
+@interface OCKTimedSymptomTrackerViewController() <OCKWeekViewDelegate, OCKCarePlanStoreDelegate, UITableViewDelegate, UITableViewDataSource, UIPageViewControllerDelegate, UIPageViewControllerDataSource>
 
 @end
 
 
-@implementation OCKSymptomTrackerViewController {
+@implementation OCKTimedSymptomTrackerViewController {
     UITableView *_tableView;
     UIRefreshControl *_refreshControl;
-    NSMutableArray<NSMutableArray<OCKCarePlanEvent *> *> *_events;
+    NSMutableArray<OCKCarePlanEvent *> *_events;
     NSMutableArray *_weekValues;
     OCKHeaderView *_headerView;
     UIPageViewController *_pageViewController;
@@ -61,11 +60,9 @@
     NSCalendar *_calendar;
     NSMutableArray *_constraints;
     NSMutableArray *_sectionTitles;
-    NSMutableArray<NSMutableArray <NSMutableArray <OCKCarePlanEvent *> *> *> *_tableViewData;
+    NSMutableArray<OCKTimedSymptomTrackerTableViewCellViewModel *> *_tableViewData;
     NSString *_otherString;
     NSString *_optionalString;
-    BOOL _isGrouped;
-    BOOL _isSorted;
 }
 
 - (instancetype)init {
@@ -80,16 +77,12 @@
         _calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
         _glyphType = OCKGlyphTypeStethoscope;
         _glyphTintColor = nil;
-        _isGrouped = YES;
-        _isSorted = YES;
     }
     return self;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _otherString = OCKLocalizedString(@"ACTIVITY_TYPE_OTHER_SECTION_HEADER", nil);
-    _optionalString = OCKLocalizedString(@"ACTIVITY_TYPE_OPTIONAL_SECTION_HEADER", nil);
     self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
     
     self.store.symptomTrackerUIDelegate = self;
@@ -144,13 +137,13 @@
 
 - (void)didActivatePullToRefreshControl:(UIRefreshControl *)sender
 {
-    if (nil == _delegate ||
-        ![_delegate respondsToSelector:@selector(symptomTrackerViewController:didActivatePullToRefreshControl:)]) {
+    if (nil == self.delegate ||
+        ![self.delegate respondsToSelector:@selector(symptomTrackerViewController:didActivatePullToRefreshControl:)]) {
         
         return;
     }
     
-    [_delegate symptomTrackerViewController:self didActivatePullToRefreshControl:sender];
+    [self.delegate timedSymptomTrackerViewController:self didActivatePullToRefreshControl:sender];
 }
 
 - (void)prepareView {
@@ -169,7 +162,7 @@
     }
     _headerView.isCareCard = NO;
     _headerView.glyphType = self.glyphType;
-    
+ 
     if (!_pageViewController) {
         _pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                                                               navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
@@ -356,21 +349,42 @@
                       dispatch_async(dispatch_get_main_queue(), ^{
                           _events = [NSMutableArray new];
                           for (NSArray<OCKCarePlanEvent *> *events in eventsGroupedByActivity) {
-                              [_events addObject:[events mutableCopy]];
+                              [_events addObjectsFromArray:[events mutableCopy]];
                           }
                           
-                          if (self.delegate &&
-                              [self.delegate respondsToSelector:@selector(symptomTrackerViewController:willDisplayEvents:dateComponents:)]) {
-                              [self.delegate symptomTrackerViewController:self willDisplayEvents:[_events copy] dateComponents:_selectedDate];
-                          }
-                          
-                          [self createGroupedEventDictionaryForEvents:_events];
+                          [self createViewModelsForEvents:_events];
                           
                           [self updateHeaderView];
                           [self updateWeekView];
                           [_tableView reloadData];
                       });
                   }];
+}
+
+- (NSArray<OCKTimedSymptomTrackerTableViewCellViewModel *> *)createViewModelsForEvents:(NSArray<OCKCarePlanEvent *> *)events {
+    NSMutableArray *morning = [NSMutableArray new];
+    NSMutableArray *noon = [NSMutableArray new];
+    NSMutableArray *afternoon = [NSMutableArray new];
+    NSMutableArray *evening = [NSMutableArray new];
+    
+    for (OCKCarePlanEvent *event in events) {
+        if (event.date.hour < 12) {
+            [morning addObject:event];
+        } else if (event.date.hour == 12) {
+            [noon addObject:event];
+        } else if (event.date.hour > 12 && event.date.hour < 17) {
+            [afternoon addObject:event];
+        } else {
+            [evening addObject:event];
+        }
+    }
+    
+    OCKTimedSymptomTrackerTableViewCellViewModel *morningViewModel = [[OCKTimedSymptomTrackerTableViewCellViewModel alloc] initWithTime:OCKTimedSymptomTrackerTimeMorning andEvents:morning onSelectedDate:_selectedDate];
+    OCKTimedSymptomTrackerTableViewCellViewModel *noonViewModel = [[OCKTimedSymptomTrackerTableViewCellViewModel alloc] initWithTime:OCKTimedSymptomTrackerTimeNoon andEvents:noon onSelectedDate:_selectedDate];
+    OCKTimedSymptomTrackerTableViewCellViewModel *afternoonViewModel = [[OCKTimedSymptomTrackerTableViewCellViewModel alloc] initWithTime:OCKTimedSymptomTrackerTimeAfternoon andEvents:afternoon onSelectedDate:_selectedDate];
+    OCKTimedSymptomTrackerTableViewCellViewModel *eveningViewModel = [[OCKTimedSymptomTrackerTableViewCellViewModel alloc] initWithTime:OCKTimedSymptomTrackerTimeEvening andEvents:evening onSelectedDate:_selectedDate];
+    
+    return [[NSArray alloc] initWithObjects:morningViewModel, noonViewModel, afternoonViewModel, eveningViewModel, nil];
 }
 
 - (void)updateHeaderView {
@@ -403,9 +417,9 @@
 
 - (void)updatePullToRefreshControl
 {
-    if (nil != _delegate &&
-        [_delegate respondsToSelector:@selector(shouldEnablePullToRefreshInSymptomTrackerViewController:)] &&
-        [_delegate shouldEnablePullToRefreshInSymptomTrackerViewController:self]) {
+    if (nil != self.delegate &&
+        [self.delegate respondsToSelector:@selector(shouldEnablePullToRefreshInSymptomTrackerViewController:)] &&
+        [self.delegate shouldEnablePullToRefreshInTimedSymptomTrackerViewController:self]) {
         
         _tableView.refreshControl = _refreshControl;
     } else {
@@ -474,85 +488,6 @@
     return [NSDateComponents ock_componentsWithDate:[NSDate date] calendar:_calendar];
 }
 
-- (void)createGroupedEventDictionaryForEvents:(NSArray<NSArray<OCKCarePlanEvent *> *> *)events {
-    NSMutableDictionary *groupedEvents = [NSMutableDictionary new];
-    NSMutableArray *groupArray = [NSMutableArray new];
-    
-    for (NSArray<OCKCarePlanEvent *> *activityEvents in events) {
-        OCKCarePlanEvent *firstEvent = activityEvents.firstObject;
-        NSString *groupIdentifier = firstEvent.activity.groupIdentifier ? firstEvent.activity.groupIdentifier : _otherString;
-        
-        if (firstEvent.activity.optional) {
-            groupIdentifier = _optionalString;
-        }
-        
-        if (!_isGrouped) {
-            // Force only one grouping
-            groupIdentifier = _otherString;
-        }
-        
-        if (groupedEvents[groupIdentifier]) {
-            NSMutableArray<NSArray *> *objects = [groupedEvents[groupIdentifier] mutableCopy];
-            [objects addObject:activityEvents];
-            groupedEvents[groupIdentifier] = objects;
-        } else {
-            NSMutableArray<NSArray *> *objects = [[NSMutableArray alloc] initWithArray:activityEvents];
-            groupedEvents[groupIdentifier] = @[objects];
-            [groupArray addObject:groupIdentifier];
-        }
-    }
-    
-    if (_isGrouped && _isSorted) {
-        
-        NSMutableArray *sortedKeys = [[groupedEvents.allKeys sortedArrayUsingSelector:@selector(compare:)] mutableCopy];
-        if ([sortedKeys containsObject:_otherString]) {
-            [sortedKeys removeObject:_otherString];
-            [sortedKeys addObject:_otherString];
-        }
-        
-        if ([sortedKeys containsObject:_optionalString]) {
-            [sortedKeys removeObject:_optionalString];
-            [sortedKeys addObject:_optionalString];
-        }
-        
-        _sectionTitles = [sortedKeys copy];
-        
-    } else {
-        
-        _sectionTitles = [groupArray mutableCopy];
-        
-    }
-    
-    NSMutableArray *array = [NSMutableArray new];
-    for (NSString *key in _sectionTitles) {
-        NSMutableArray *groupArray = [NSMutableArray new];
-        NSArray *groupedEventsArray = groupedEvents[key];
-        
-        if (_isSorted) {
-            
-            NSMutableDictionary *activitiesDictionary = [NSMutableDictionary new];
-            for (NSArray<OCKCarePlanEvent *> *events in groupedEventsArray) {
-                NSString *activityTitle = events.firstObject.activity.title;
-                activitiesDictionary[activityTitle] = events;
-            }
-            
-            NSArray *sortedActivitiesKeys = [activitiesDictionary.allKeys sortedArrayUsingSelector:@selector(compare:)];
-            for (NSString *activityKey in sortedActivitiesKeys) {
-                [groupArray addObject:activitiesDictionary[activityKey]];
-            }
-            
-            [array addObject:groupArray];
-            
-        } else {
-            
-            [array addObject:[groupedEventsArray mutableCopy]];
-            
-        }
-    }
-    
-    _tableViewData = [array mutableCopy];
-}
-
 
 #pragma mark - OCKWeekViewDelegate
 
@@ -566,42 +501,6 @@
     NSDateComponents *today = [self today];
     NSDateComponents *selectedDate = [self dateFromSelectedIndex:index];
     return ![selectedDate isLaterThan:today];
-}
-
-#pragma mark - OCKCarePlanStoreDelegate
-
-- (void)carePlanStore:(OCKCarePlanStore *)store didReceiveUpdateOfEvent:(OCKCarePlanEvent *)event {
-    for (int i = 0; i < _tableViewData.count; i++) {
-        NSMutableArray<NSMutableArray <OCKCarePlanEvent *> *> *groupedEvents = _tableViewData[i];
-        
-        for (int j = 0; j < groupedEvents.count; j++) {
-            NSMutableArray<OCKCarePlanEvent *> *events = groupedEvents[j];
-            
-            if ([events.firstObject.activity.identifier isEqualToString:event.activity.identifier]) {
-                if (events[event.occurrenceIndexOfDay].numberOfDaysSinceStart == event.numberOfDaysSinceStart) {
-                    [events replaceObjectAtIndex:event.occurrenceIndexOfDay withObject:event];
-                    _tableViewData[i][j] = events;
-                    
-                    [self updateHeaderView];
-                    
-                    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:j inSection:i];
-                    OCKSymptomTrackerTableViewCell *cell = [_tableView cellForRowAtIndexPath:indexPath];
-                    cell.assessmentEvent = event;
-                }
-                break;
-            }
-            
-        }
-        
-    }
-    
-    if ([event.date isInSameWeekAsDate: self.selectedDate]) {
-        [self updateWeekView];
-    }
-}
-
-- (void)carePlanStoreActivityListDidChange:(OCKCarePlanStore *)store {
-    [self fetchEvents];
 }
 
 
@@ -645,52 +544,38 @@
 
 #pragma mark - UITableViewDelegate
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    NSString *sectionTitle = _sectionTitles[section];
-    if ([sectionTitle isEqualToString:_otherString] && (_sectionTitles.count == 1 || (_sectionTitles.count == 2 && [_sectionTitles containsObject:_optionalString]))) {
-        sectionTitle = nil;
-    }
-    return sectionTitle;
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    OCKCarePlanEvent *selectedEvent = _tableViewData[indexPath.section][indexPath.row].firstObject;
-    _lastSelectedAssessmentEvent = selectedEvent;
-    
-    if (_delegate &&
-        [_delegate respondsToSelector:@selector(symptomTrackerViewController:didSelectRowWithAssessmentEvent:)]) {
-        [_delegate symptomTrackerViewController:self didSelectRowWithAssessmentEvent:selectedEvent];
+    OCKTimedSymptomTrackerTableViewCellViewModel *viewModel = _tableViewData[indexPath.row];
+
+    if (self.delegate &&
+        [self.delegate respondsToSelector:@selector(timedSymptomTrackerViewController:didSelectRowWithTrackerTime:AndEvents:)]) {
+        [self.delegate timedSymptomTrackerViewController:self didSelectRowWithTrackerTime:viewModel.time AndEvents:viewModel.events];
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-}
-
-- (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
-    OCKCarePlanEvent *selectedEvent = _tableViewData[indexPath.section][indexPath.row].firstObject;
-    return !(selectedEvent.state == OCKCarePlanEventStateCompleted && !selectedEvent.activity.resultResettable);
 }
 
 
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return _tableViewData.count;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return _tableViewData[section].count;
+    return _tableViewData.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *CellIdentifier = @"SymptomTrackerCell";
-    OCKSymptomTrackerTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    OCKTimedSymptomTrackerTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (!cell) {
-        cell = [[OCKSymptomTrackerTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+        cell = [[OCKTimedSymptomTrackerTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                                      reuseIdentifier:CellIdentifier];
     }
-    cell.assessmentEvent = _tableViewData[indexPath.section][indexPath.row].firstObject;
+    
+    [cell setUpCellWith:_tableViewData[indexPath.row]];
     return cell;
 }
-
 
 @end
