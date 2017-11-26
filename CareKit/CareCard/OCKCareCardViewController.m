@@ -65,6 +65,7 @@
     NSString *_otherString;
     NSString *_optionalString;
     BOOL _isGrouped;
+    BOOL _showsGroupTitles;
     BOOL _isSorted;
     UIRefreshControl *_refreshControl;
     NSString *_medButtonSize;
@@ -82,6 +83,7 @@
         _calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
         _glyphTintColor = nil;
         _isGrouped = YES;
+        _showsGroupTitles = YES;
         _isSorted = YES;
         _medButtonSize = [NSString stringWithFormat:@"Normal"];
     }
@@ -372,31 +374,6 @@
                               [self.delegate careCardViewController:self willDisplayEvents:[_events copy] dateComponents:_selectedDate];
                           }
                           
-                          UIColor *yellowColor = [UIColor colorWithRed:0xF5/255.0 green:0xca/255.0 blue:0x7c/255.0 alpha:1.0];
-                          
-                          //MODIFIED
-                          [_events sortUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-                              OCKCarePlanEvent *event1 = (OCKCarePlanEvent*)((NSArray*)obj1).firstObject;
-                              OCKCarePlanEvent *event2 = (OCKCarePlanEvent*)((NSArray*)obj2).firstObject;
-                              
-                              // Same type
-                              if ([event1.activity.tintColor isEqual:event2.activity.tintColor]) {
-                                  if ([event1.activity.title compare:event2.activity.title] == NSOrderedAscending) {
-                                      return NSOrderedAscending;
-                                  } else {
-                                      return NSOrderedDescending;
-                                  }
-                              } else {
-                                  if ([self color:event1.activity.tintColor isEqualToColor:yellowColor withTolerance:.1]) {
-                                      return NSOrderedAscending;
-                                  } else if ([self color:event2.activity.tintColor isEqualToColor:yellowColor withTolerance:.1]) {
-                                      return NSOrderedDescending;
-                                  } else {
-                                      return NSOrderedSame;
-                                  }
-                              }
-                          }];
-                          
                           [self createGroupedEventDictionaryForEvents:_events];
                           
                           [self updateHeaderView];
@@ -568,6 +545,12 @@
         if ([sortedKeys containsObject:_optionalString]) {
             [sortedKeys removeObject:_optionalString];
             [sortedKeys addObject:_optionalString];
+        }
+        
+        // RD: Added so medications are on top
+        if ([sortedKeys containsObject:@"medication"]) {
+            [sortedKeys removeObject:@"medication"];
+            [sortedKeys insertObject:@"medication" atIndex:0];
         }
         
         _sectionTitles = [sortedKeys copy];
@@ -747,14 +730,14 @@
 
 #pragma mark - UITableViewDelegate
 
-// RD: Commented out so our lowercase group IDs don't show up in header titles
-//- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-//    NSString *sectionTitle = _sectionTitles[section];
-//    if ([sectionTitle isEqualToString:_otherString] && (_sectionTitles.count == 1 || (_sectionTitles.count == 2 && [_sectionTitles containsObject:_optionalString]))) {
-//        sectionTitle = @"";
-//    }
-//    return sectionTitle;
-//}
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (!_showsGroupTitles) { return nil; }  // RD: Added
+    NSString *sectionTitle = _sectionTitles[section];
+    if ([sectionTitle isEqualToString:_otherString] && (_sectionTitles.count == 1 || (_sectionTitles.count == 2 && [_sectionTitles containsObject:_optionalString]))) {
+        sectionTitle = @"";
+    }
+    return sectionTitle;
+}
 
 // ADDED
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
