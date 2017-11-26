@@ -61,6 +61,7 @@ static const CGFloat HorizontalMargin = 10.0;
 - (void)setUpCellWith:(OCKTimedSymptomTrackerTableViewCellViewModel *)viewModel {
     _viewModel = viewModel;
     self.assessmentEvents = viewModel.events;
+    self.tintColor = _assessmentEvents.firstObject.activity.tintColor;
     [self prepareView];
 }
 
