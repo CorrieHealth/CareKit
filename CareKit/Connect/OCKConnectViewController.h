@@ -144,7 +144,7 @@ NS_ASSUME_NONNULL_BEGIN
  It includes a master view and a detail view. Therefore, it must be embedded inside a `UINavigationController`.
  */
 OCK_CLASS_AVAILABLE
-@interface OCKConnectViewController : UIViewController <MFMessageComposeViewControllerDelegate, MFMailComposeViewControllerDelegate>
+@interface OCKConnectViewController : UIViewController <UITableViewDelegate, MFMessageComposeViewControllerDelegate, MFMailComposeViewControllerDelegate>
 
 /**
  Returns an initialized connect view controller using the specified contacts.
