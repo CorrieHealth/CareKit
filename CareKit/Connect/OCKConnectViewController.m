@@ -295,11 +295,17 @@
 }
 
 // Added
--(OCKContact*)deleteRowAtIndexPath:(NSIndexPath*)indexPath {
+-(OCKContact *)contactAtIndexPath:(NSIndexPath*)indexPath {
+    NSMutableArray *mutableArray = [[_sectionedContacts objectAtIndex:indexPath.section] mutableCopy];
+    OCKContact *contact = [mutableArray objectAtIndex:indexPath.row];
+    return contact;
+}
+
+-(OCKContact *)deleteRowAtIndexPath:(NSIndexPath*)indexPath {
     
     // Update sectioned contacts
     NSMutableArray *mutableArray = [[_sectionedContacts objectAtIndex:indexPath.section] mutableCopy];
-    OCKContact* deletedContact = [mutableArray objectAtIndex:indexPath.row];
+    OCKContact *deletedContact = [mutableArray objectAtIndex:indexPath.row];
     [mutableArray removeObjectAtIndex:indexPath.row];
     
     // Ensure size of section isn't zero

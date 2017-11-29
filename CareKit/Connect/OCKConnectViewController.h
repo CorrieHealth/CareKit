@@ -205,13 +205,23 @@ OCK_CLASS_AVAILABLE
 
 
 /**
+ *  Get a contact from a sepcific section/row
+ *
+ *  @param indexPath the section/row to delete
+ *
+ *  @return the contact that was deleted
+ */
+-(OCKContact *)contactAtIndexPath:(NSIndexPath*)indexPath;
+
+
+/**
  *  Delete a contact from a sepcific section/row
  *
  *  @param indexPath the section/row to delete
  *
  *  @return the contact that was deleted 
  */
--(OCKContact*)deleteRowAtIndexPath:(NSIndexPath*)indexPath;
+-(OCKContact *)deleteRowAtIndexPath:(NSIndexPath*)indexPath;
 
 
 @end
