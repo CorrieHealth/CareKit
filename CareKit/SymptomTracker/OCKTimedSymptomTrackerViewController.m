@@ -326,7 +326,7 @@
     }
 }
 
-- (void)setDelegate:(id<OCKSymptomTrackerViewControllerDelegate>)delegate
+- (void)setDelegate:(id<OCKTimedSymptomTrackerViewControllerDelegate>)delegate
 {
     _delegate = delegate;
     
