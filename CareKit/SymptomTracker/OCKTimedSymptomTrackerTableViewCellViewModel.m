@@ -40,6 +40,7 @@
         }
     }
     
+    _time = time;
     _title = [self titleFor:time];
     _subtitle = [titles componentsJoinedByString:@", "];
     _valueText = [NSString stringWithFormat:@"%i/%lu", completionCount, (unsigned long)[events count]];
@@ -64,7 +65,7 @@
     }
 }
 
-- (int) hourComponentFor:(OCKTimedSymptomTrackerTime)time {
+- (NSInteger) hourComponentFor:(OCKTimedSymptomTrackerTime)time {
     switch (time) {
         case OCKTimedSymptomTrackerTimeMorning:
             return 8;
@@ -86,29 +87,18 @@
     return event.activity.title;
 }
 
-/// Used to disable any rows that are too far into the future (>1 hour).
-- (BOOL) shouldBeEnabledOnDate:(NSDateComponents *)dateComponents {
+/// Used to determine if the measurement group is too far into the future (>2 hours).
+- (BOOL) cellShouldBeEnabled {
     NSCalendar *calendar = [NSCalendar currentCalendar];
-    NSDateComponents *eventComponents = [_selectedDate copy];
+    NSDateComponents *todayComponents = [calendar componentsInTimeZone:[NSTimeZone localTimeZone] fromDate:[NSDate date]];
     
-    if (![eventComponents isEqual:dateComponents]) {
-        return false;  // Return false if the date isn't the same
+    if (todayComponents.day != _selectedDate.day) {
+        return false;  // Return false if the date isn't today
     }
     
     // If the date is today, limit the time at which you can take a measurement so people don't do it too early
-
-    // Fix the task date to keep the time, but match the date of the current date
-    eventComponents.year = dateComponents.year;
-    eventComponents.month = dateComponents.month;
-    eventComponents.day = dateComponents.day;
-    eventComponents.hour = [self hourComponentFor:self.time] - 1;
-    if (eventComponents.hour < 0) { eventComponents.hour = 23; eventComponents.day -= 1; }
-    NSDate *comparisonDate = [calendar dateFromComponents:dateComponents];
-    NSDate *fixedEventDate = [calendar dateFromComponents:eventComponents];
-    
-    // Disable any tasks that are in the future
-    NSComparisonResult result = [comparisonDate compare:fixedEventDate];
-    return result != NSOrderedAscending;
+    NSInteger hour = [self hourComponentFor:_time];
+    return todayComponents.hour >= hour - 2;
 }
 
 @end

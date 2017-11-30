@@ -100,7 +100,7 @@ static const CGFloat HorizontalMargin = 10.0;
     _valueLabel.text = _viewModel.valueText;
     _valueLabel.textColor = self.tintColor;
     
-    BOOL enabled = [_viewModel shouldBeEnabledOnDate:[NSDate date]];
+    BOOL enabled = [_viewModel cellShouldBeEnabled];
     self.userInteractionEnabled = enabled;
     self.accessoryType = enabled ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
 }

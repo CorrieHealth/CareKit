@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSArray<OCKCarePlanEvent *> *events;
 
-- (BOOL) shouldBeEnabledOnDate:(NSDate *)date;
+- (BOOL) cellShouldBeEnabled;
 
 @end
 
