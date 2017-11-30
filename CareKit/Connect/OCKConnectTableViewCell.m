@@ -57,6 +57,7 @@ static const CGFloat ImageViewSize = 40.0;
     [super prepareView];
     
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    self.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     if (!_imageView) {
         _imageView = [UIImageView new];
