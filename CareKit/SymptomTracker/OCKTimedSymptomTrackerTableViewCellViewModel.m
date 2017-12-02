@@ -93,7 +93,7 @@
     NSDateComponents *todayComponents = [calendar componentsInTimeZone:[NSTimeZone localTimeZone] fromDate:[NSDate date]];
     
     if (todayComponents.day != _selectedDate.day) {
-        return false;  // Return false if the date isn't today
+        return true;  // Return true if the date isn't today (i.e. all past events are selectable)
     }
     
     // If the date is today, limit the time at which you can take a measurement so people don't do it too early
