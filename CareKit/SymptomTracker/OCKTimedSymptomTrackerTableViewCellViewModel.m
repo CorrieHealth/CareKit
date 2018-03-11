@@ -89,6 +89,10 @@
 
 /// Used to determine if the measurement group is too far into the future (>2 hours).
 - (BOOL) cellShouldBeEnabled {
+    if ([_events count] < 1) {
+        return false;
+    }
+    
     NSCalendar *calendar = [NSCalendar currentCalendar];
     NSDateComponents *todayComponents = [calendar componentsInTimeZone:[NSTimeZone localTimeZone] fromDate:[NSDate date]];
     
