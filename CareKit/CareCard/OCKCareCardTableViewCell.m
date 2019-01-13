@@ -37,7 +37,6 @@
 #import "OCKHelpers.h"
 #import "OCKDefines_Private.h"
 #import "OCKLabel.h"
-#import "Colors.h"
 
 
 static const CGFloat TopMargin = 20.0;
@@ -61,27 +60,7 @@ static const CGFloat ButtonViewSize = 40.0;
     UIButton *_button;
     OCKCarePlanActivity *_intervention;
     NSMutableArray *_constraints;
-    OCKLabel *_missedDoseLabel;
 }
-
-//mark the button with a red tint color if the dose has been missed
-- (void)updateButtonColors {
-    for (int i = 0; i < sizeof(_missedDoses); i++) {
-        
-        /* Uncomment block to track missed doses
-         if ([[_missedDoses objectAtIndex: i] boolValue] == YES ) {
-         ((OCKCareCardButton *)[_frequencyButtons objectAtIndex: i]).tintColor = [UIColor redColor];
-         } else {
-         ((OCKCareCardButton *)[_frequencyButtons objectAtIndex: i]).tintColor = self.tintColor;
-         }
-         */
-        //Remove this line if block above is uncommented
-        ((OCKCareCardButton *)[_frequencyButtons objectAtIndex: i]).tintColor = self.tintColor;
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        
-    }
-}
-
 
 - (void)setInterventionEvents:(NSArray<OCKCarePlanEvent *> *)interventionEvents {
     if (interventionEvents.count > 14) {
@@ -101,17 +80,7 @@ static const CGFloat ButtonViewSize = 40.0;
     if (!_titleLabel) {
         _titleLabel = [OCKLabel new];
         _titleLabel.textStyle = UIFontTextStyleHeadline;
-        _titleLabel.textColor = TextColor;
         [self addSubview:_titleLabel];
-    }
-    
-    if (!_missedDoseLabel) {
-        _missedDoseLabel = [OCKLabel new];
-        _missedDoseLabel.text = @"Dose Missed";
-        _missedDoseLabel.textColor = TextColor;
-        _missedDoseLabel.textStyle = UIFontTextStyleCaption1;
-        _missedDoseLabel.textColor = TintColor;
-        [self addSubview:_missedDoseLabel];
     }
     
     if (!_textLabel) {
@@ -127,27 +96,9 @@ static const CGFloat ButtonViewSize = 40.0;
     
     _frequencyButtons = [NSArray new];
     NSMutableArray *buttons = [NSMutableArray new];
-    BOOL doseMissed = NO;
-    int i = 0;
     for (OCKCarePlanEvent *event in self.interventionEvents) {
         OCKCareCardButton *frequencyButton = [[OCKCareCardButton alloc] initWithFrame:CGRectZero];
-        
-        /*  !!!!! Uncomment block to track missed doses !!!!!
-         //mark button red if dose is missed
-         if ( ([[_missedDoses objectAtIndex: i] boolValue] == YES) &&
-         (event.state == OCKCarePlanEventStateNotCompleted || event.state == OCKCarePlanEventStateInitial)) {
-         
-         frequencyButton.tintColor = TintColor;
-         doseMissed = YES;
-         } else {
-         frequencyButton.tintColor = self.tintColor;
-         }
-         */
-        
-        //Remove this line if block above is uncommented
         frequencyButton.tintColor = self.tintColor;
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        
         frequencyButton.selected = (event.state == OCKCarePlanEventStateCompleted);
         frequencyButton.translatesAutoresizingMaskIntoConstraints = NO;
         
@@ -157,14 +108,8 @@ static const CGFloat ButtonViewSize = 40.0;
         [buttons addObject:frequencyButton];
         
         [self addSubview:frequencyButton];
-        i+=1;
     }
     _frequencyButtons = [buttons copy];
-    
-    //hide/show dose missed label if at least one missed
-    _missedDoseLabel.hidden = !doseMissed;
-    
-    
     
     if (!_button) {
         _button = [UIButton new];
@@ -189,7 +134,6 @@ static const CGFloat ButtonViewSize = 40.0;
     
     _titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
     _textLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    _missedDoseLabel.translatesAutoresizingMaskIntoConstraints = NO;
     _button.translatesAutoresizingMaskIntoConstraints = NO;
     
     [_titleLabel setContentCompressionResistancePriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
@@ -278,23 +222,7 @@ static const CGFloat ButtonViewSize = 40.0;
                                                                         toItem:nil
                                                                      attribute:NSLayoutAttributeNotAnAttribute
                                                                     multiplier:1.0
-                                                                      constant:30.0 + TrailingMargin],
-                                        
-                                        [NSLayoutConstraint constraintWithItem:_missedDoseLabel
-                                                                     attribute:NSLayoutAttributeCenterY
-                                                                     relatedBy:NSLayoutRelationEqual
-                                                                        toItem:self
-                                                                     attribute:NSLayoutAttributeCenterY
-                                                                    multiplier:1.0
-                                                                      constant:0],
-                                        [NSLayoutConstraint constraintWithItem:_missedDoseLabel
-                                                                     attribute:NSLayoutAttributeTrailing
-                                                                     relatedBy:NSLayoutRelationEqual
-                                                                        toItem:self
-                                                                     attribute:NSLayoutAttributeTrailing
-                                                                    multiplier:1.0
-                                                                      constant:-(TrailingMargin + 5)],
-                                        
+                                                                      constant:30.0 + TrailingMargin]
                                         ]];
     
     for (int i = 0; i < _frequencyButtons.count; i++) {
@@ -369,7 +297,7 @@ static const CGFloat ButtonViewSize = 40.0;
                                             ]];
     }
     
-    int index = (_frequencyButtons.count < 7) ? 0 : 7;
+    int index = (_frequencyButtons.count <= 7) ? 0 : 7;
     for (int i = index; i <_frequencyButtons.count; i++) {
         [_constraints addObjectsFromArray:@[
                                             [NSLayoutConstraint constraintWithItem:_frequencyButtons[i]

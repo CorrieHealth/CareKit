@@ -36,6 +36,7 @@
 #import "OCKWeekViewController.h"
 #import "NSDateComponents+CarePlanInternal.h"
 #import "OCKHeaderView.h"
+#import "OCKLabel.h"
 #import "OCKCareCardTableViewCell.h"
 #import "OCKWeekLabelsView.h"
 #import "OCKCarePlanStore_Internal.h"
@@ -65,9 +66,10 @@
     NSString *_otherString;
     NSString *_optionalString;
     BOOL _isGrouped;
-    BOOL _showsGroupTitles;
     BOOL _isSorted;
+    BOOL _showsGroupTitles;
     UIRefreshControl *_refreshControl;
+    OCKLabel *_noActivitiesLabel;
     NSString *_medButtonSize;
 }
 
@@ -83,8 +85,8 @@
         _calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
         _glyphTintColor = nil;
         _isGrouped = YES;
-        _showsGroupTitles = YES;
         _isSorted = YES;
+        _showsGroupTitles = YES;
         _medButtonSize = [NSString stringWithFormat:@"Normal"];
     }
     return self;
@@ -126,6 +128,16 @@
     [_refreshControl addTarget:self action:@selector(didActivatePullToRefreshControl:) forControlEvents:UIControlEventValueChanged];
     _tableView.refreshControl = _refreshControl;
     [self updatePullToRefreshControl];
+    
+    _noActivitiesLabel = [OCKLabel new];
+    _noActivitiesLabel.hidden = YES;
+    _noActivitiesLabel.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    _noActivitiesLabel.textStyle = UIFontTextStyleTitle2;
+    _noActivitiesLabel.textColor = [UIColor lightGrayColor];
+    _noActivitiesLabel.text = self.noActivitiesText;
+    _noActivitiesLabel.textAlignment = NSTextAlignmentCenter;
+    _noActivitiesLabel.numberOfLines = 0;
+    _tableView.backgroundView = _noActivitiesLabel;
     
     self.navigationController.navigationBar.translucent = NO;
     [self.navigationController.navigationBar setBarTintColor:[UIColor colorWithRed:245.0/255.0 green:244.0/255.0 blue:246.0/255.0 alpha:1.0]];
@@ -356,6 +368,11 @@
     }
 }
 
+- (void)setNoActivitiesText:(NSString *)noActivitiesText {
+    _noActivitiesText = noActivitiesText;
+    _noActivitiesLabel.text = noActivitiesText;
+}
+
 #pragma mark - Helpers
 
 - (void)fetchEvents {
@@ -374,6 +391,7 @@
                               [self.delegate careCardViewController:self willDisplayEvents:[_events copy] dateComponents:_selectedDate];
                           }
                           
+                          _noActivitiesLabel.hidden = (_events.count > 0);
                           [self createGroupedEventDictionaryForEvents:_events];
                           
                           [self updateHeaderView];
@@ -775,40 +793,6 @@
         cell = [[OCKCareCardTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
                                                reuseIdentifier:CellIdentifier];
     }
-    
-    /* !!!!! Uncomment block to track missed Doses !!!!!!
-     
-     //check if any doses have been missed
-     if (sizeof(_events[indexPath.row]) > 0) {
-     
-     //get variables from activity object
-     NSArray<NSDate *> *dates = (NSArray *)_events[indexPath.row][0].activity.userInfo[@"dose_dates"];
-     NSNumber *numberOfDoses = (NSNumber *)_events[indexPath.row][0].activity.userInfo[@"number_of_doses"];
-     NSMutableArray* missedDoses = [[NSMutableArray alloc] init];
-     
-     for (int i = 0; i < numberOfDoses.intValue; i++) {
-     
-     //combine dose time with todays date
-     unsigned unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth |  NSCalendarUnitDay;
-     NSDateComponents *comps = [[NSCalendar currentCalendar] components:unitFlags fromDate:[NSDate new]];
-     NSDate *combinedDate = [[NSCalendar currentCalendar] dateFromComponents:comps];
-     unitFlags = NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
-     comps = [[NSCalendar currentCalendar] components:unitFlags fromDate:dates[i]];
-     combinedDate = [[NSCalendar currentCalendar] dateByAddingComponents:comps toDate:combinedDate options:0];
-     
-     //check if the new combined date is in the past
-     if(([self date:combinedDate isBefore:YES otherDate:[NSDate date]])) {
-     [missedDoses addObject:[NSNumber numberWithBool: YES]];
-     } else {
-     [missedDoses addObject:[NSNumber numberWithBool: NO]];
-     }
-     }
-     
-     cell.missedDoses = missedDoses;
-     }
-     
-     */
-    
     cell.interventionEvents = _tableViewData[indexPath.section][indexPath.row];
     cell.delegate = self;
     

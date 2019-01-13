@@ -204,6 +204,14 @@ OCK_CLASS_AVAILABLE
  */
 @property (nonatomic, copy) NSString *customGlyphImageName;
 
+/** 
+ A message that will be displayed in the table view's background view if there are
+ no intervention activities to display.
+ 
+ If the value is not specified, nothing will be shown when the table is empty.
+ */
+@property (nonatomic, nullable) NSString *noActivitiesText;
+
 /**
  The property that allows activities to be grouped.
  
@@ -215,16 +223,6 @@ OCK_CLASS_AVAILABLE
 @property (nonatomic) BOOL isGrouped;
 
 /**
- The property that allows grouped activities to show the table view header title.
- 
- If true, the table view sections will have header titles,
- otherwise they will not be shown.
- 
- The default is false.
- */
-@property (nonatomic) BOOL showsGroupTitles;
-
-/**
  The property that allows activities to be sorted.
  
  If true, the activities will be sorted alphabetically by title and by groupIdentifier if isGrouped is true,
@@ -233,6 +231,18 @@ OCK_CLASS_AVAILABLE
  The default is true.
  */
 @property (nonatomic) BOOL isSorted;
+
+/**
+ The property that allows grouped activities to show the table view header title.
+ 
+ If true, the table view sections will have header titles,
+ otherwise they will not be shown.
+ 
+ The default is true.
+ 
+ [RD added]
+ */
+@property (nonatomic) BOOL showsGroupTitles;
 
 @property (nonatomic) NSDateComponents *selectedDate;
 

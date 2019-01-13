@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @param viewController              The view controller providing the callback.
  @param refreshControl              The refresh control which has been triggered, where `isRefreshing` should always be YES.
- It is the developers responsibility to call `endRefreshing` as appropriate, on the main thread.
+                                    It is the developers responsibility to call `endRefreshing` as appropriate, on the main thread.
  */
 - (void)symptomTrackerViewController:(OCKSymptomTrackerViewController *)viewController didActivatePullToRefreshControl:(UIRefreshControl *)refreshControl;
 
@@ -167,11 +167,17 @@ OCK_CLASS_AVAILABLE
 @property (nonatomic) NSString *customGlyphImageName;
 
 /**
+ Optional: A message that will be displayed in the table view's background view
+ if there are no assessments to display.
+ */
+@property (nonatomic, nullable) NSString *noActivitiesText;
+
+/**
  The property that allows activities to be grouped.
  
  If true, the activities will be grouped by groupIdentifier into sections,
  otherwise the activities will all be in one section and groupIdentifier is ignored.
- 
+  
  The default is true.
  */
 @property (nonatomic) BOOL isGrouped;

@@ -34,7 +34,6 @@
 #import "OCKHelpers.h"
 #import "OCKDefines_Private.h"
 #import "OCKLabel.h"
-#import "Colors.h"
 
 
 static const CGFloat RingViewSize = 110.0;
@@ -281,7 +280,7 @@ static const CGFloat RingViewSize = 110.0;
 }
 
 - (NSString *)accessibilityLabel {
-    return OCKAccessibilityStringForVariables(self.ringView, _titleLabel, _dateLabel);
+    return OCKAccessibilityStringForVariables(_titleLabel, _dateLabel);
 }
 
 @end

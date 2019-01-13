@@ -35,6 +35,7 @@
 #import "NSDateComponents+CarePlanInternal.h"
 #import "OCKWeekView.h"
 #import "OCKHeaderView.h"
+#import "OCKLabel.h"
 #import "OCKSymptomTrackerTableViewCell.h"
 #import "OCKWeekLabelsView.h"
 #import "OCKCarePlanStore_Internal.h"
@@ -64,6 +65,7 @@
     NSMutableArray<NSMutableArray <NSMutableArray <OCKCarePlanEvent *> *> *> *_tableViewData;
     NSString *_otherString;
     NSString *_optionalString;
+    OCKLabel *_noActivitiesLabel;
     BOOL _isGrouped;
     BOOL _isSorted;
 }
@@ -117,6 +119,16 @@
     _tableView.estimatedSectionHeaderHeight = 0;
     _tableView.estimatedSectionFooterHeight = 0;
     
+    _noActivitiesLabel = [OCKLabel new];
+    _noActivitiesLabel.hidden = YES;
+    _noActivitiesLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _noActivitiesLabel.textStyle = UIFontTextStyleTitle2;
+    _noActivitiesLabel.textColor = [UIColor lightGrayColor];
+    _noActivitiesLabel.textAlignment = NSTextAlignmentCenter;
+    _noActivitiesLabel.numberOfLines = 0;
+    _noActivitiesLabel.text = self.noActivitiesText;
+    _tableView.backgroundView = _noActivitiesLabel;
+    
     _refreshControl = [[UIRefreshControl alloc] init];
     _refreshControl.tintColor = [UIColor grayColor];
     [_refreshControl addTarget:self action:@selector(didActivatePullToRefreshControl:) forControlEvents:UIControlEventValueChanged];
@@ -169,7 +181,7 @@
     }
     _headerView.isCareCard = NO;
     _headerView.glyphType = self.glyphType;
-    
+ 
     if (!_pageViewController) {
         _pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                                                               navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
@@ -346,6 +358,11 @@
     }
 }
 
+- (void)setNoActivitiesText:(NSString *)noActivitiesText {
+    _noActivitiesText = noActivitiesText;
+    _noActivitiesLabel.text = noActivitiesText;
+}
+
 #pragma mark - Helpers
 
 - (void)fetchEvents {
@@ -364,6 +381,7 @@
                               [self.delegate symptomTrackerViewController:self willDisplayEvents:[_events copy] dateComponents:_selectedDate];
                           }
                           
+                          _noActivitiesLabel.hidden = (_events.count > 0);
                           [self createGroupedEventDictionaryForEvents:_events];
                           
                           [self updateHeaderView];
@@ -371,6 +389,7 @@
                           [_tableView reloadData];
                       });
                   }];
+                      
 }
 
 - (void)updateHeaderView {

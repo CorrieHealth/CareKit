@@ -274,15 +274,6 @@ static const CGFloat HeaderViewHeight = 225.0;
                                                       reuseIdentifier:ContactCellIdentifier];
             cell.tintColor = self.contact.tintColor;
         }
-
-        /* ADDED TO HANDLE NEW VARIABLES ******************
-        if ([_tableViewData[indexPath.section][indexPath.row] intValue] == OCKConnectTypeOther) {
-            cell.otherTitle = _rowTitles[indexPath.row];
-            cell.otherValue = _rowValues[indexPath.row];
-        }
-        
-        cell.contact = self.contact;*/
-
         cell.contactInfo = _tableViewData[indexPath.section][indexPath.row];
         cell.delegate = self;
         return cell;
