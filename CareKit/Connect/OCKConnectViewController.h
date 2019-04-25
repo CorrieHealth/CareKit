@@ -157,19 +157,6 @@ OCK_CLASS_AVAILABLE
 - (instancetype)initWithContacts:(nullable NSArray<OCKContact *> *)contacts
                          patient:(nullable OCKPatient *)patient;
 
-
-/**
- Returns an initialized connect view controller using the specified contacts.
- 
- @param contacts        An array of `OCKContact` objects.
- @param patient         A patient object.
- 
- @return An initialized connect view controller.
- */
-- (instancetype)initWithContacts:(nullable NSArray<OCKContact *> *)contacts
-                         patient:(nullable OCKPatient *)patient;
-
-
 /**
  Returns an initialized connect view controller using the specified contacts.
  

@@ -108,7 +108,7 @@
                                                                              action:@selector(showToday:)];
     self.navigationItem.rightBarButtonItem.tintColor = self.glyphTintColor;
     
-    _tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
+    _tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStyleGrouped];
     _tableView.dataSource = self;
     _tableView.delegate = self;
     [self.view addSubview:_tableView];
