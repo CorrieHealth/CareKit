@@ -192,6 +192,16 @@ OCK_CLASS_AVAILABLE
  */
 @property (nonatomic) BOOL isSorted;
 
+/**
+ The property that allows grouped activities to show the table view header title.
+ 
+ If true, the table view sections will have header titles,
+ otherwise they will not be shown.
+ 
+ The default is false.
+ */
+@property (nonatomic) BOOL showsGroupTitles;
+
 @end
 
 NS_ASSUME_NONNULL_END

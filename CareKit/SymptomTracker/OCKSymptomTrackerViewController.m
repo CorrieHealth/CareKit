@@ -68,6 +68,7 @@
     OCKLabel *_noActivitiesLabel;
     BOOL _isGrouped;
     BOOL _isSorted;
+    BOOL _showsGroupTitles;
 }
 
 - (instancetype)init {
@@ -84,6 +85,7 @@
         _glyphTintColor = nil;
         _isGrouped = YES;
         _isSorted = YES;
+        _showsGroupTitles = YES;
     }
     return self;
 }
@@ -665,6 +667,7 @@
 #pragma mark - UITableViewDelegate
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (!_showsGroupTitles) { return nil; }  // RD: Added
     NSString *sectionTitle = _sectionTitles[section];
     if ([sectionTitle isEqualToString:_otherString] && (_sectionTitles.count == 1 || (_sectionTitles.count == 2 && [_sectionTitles containsObject:_optionalString]))) {
         sectionTitle = nil;
