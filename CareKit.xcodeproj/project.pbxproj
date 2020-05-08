@@ -1082,6 +1082,10 @@
 				"zh-HK",
 				"zh-Hant",
 				"es-419",
+				zh_CN,
+				zh_HK,
+				zh_TW,
+				es_419,
 			);
 			mainGroup = 8605A5B01C4F04EC00DD65FF;
 			productRefGroup = 8605A5BB1C4F04EC00DD65FF /* Products */;
