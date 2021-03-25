@@ -1,0 +1,11 @@
+framework module CareKitLegacy {
+  umbrella header "CareKitLegacy.h"
+
+  module Private {
+    umbrella header "CareKitLegacy_Private.h"
+    export *
+  }
+
+  export *
+  module * { export * }
+}

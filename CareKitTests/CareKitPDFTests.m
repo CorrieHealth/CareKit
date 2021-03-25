@@ -30,7 +30,7 @@
 
 
 #import <XCTest/XCTest.h>
-#import <CareKit/CareKit.h>
+#import <CareKitLegacy/CareKitLegacy.h>
 
 
 @interface CareKitPDFTests : XCTestCase

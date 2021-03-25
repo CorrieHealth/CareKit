@@ -30,8 +30,8 @@
 
 
 #import <XCTest/XCTest.h>
-#import <CareKit/CareKit.h>
-#import <CareKit/CareKit_Private.h>
+#import <CareKitLegacy/CareKitLegacy.h>
+#import <CareKitLegacy/CareKit_Private.h>
 #import "NSDateComponents+CarePlanInternal.h"
 
 
